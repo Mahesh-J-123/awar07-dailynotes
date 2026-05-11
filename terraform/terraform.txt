@@ -1,0 +1,146 @@
+
+IaC : Infrastructure as Code
+
+Terraform, pulumiu, OpenTofu, Cloudforamtion : IaC  
+Docker / Vagrant / Golden AMI : Server Templating
+Ansible, Puppet , saltstack : Configuration Management
+
+
+Cloudforamtion : Supports Only AWS 
+Terraform : Support All cloud platforms and onpremise i.e; k8s / git : Cloud Agnostic Platform
+
+2014 --> Mitchell Hashimoto
+IBM acquired it and made it as a close source.
+terraform developed using Go language.
+
+HCL : HashiCorp Configuration Language
+
+
+Terraform works in 3 simple steps.
+
+step 1 : Write : WE can write what we want to create (.tf files)
+Step 2 : Plan  : Terraform shows what it will do. Wont create, just displays.
+Step 3 : Apply : Terraform automatically create/change/delete the resources.
+
+Terraform Core : The main orchestartion engine that performs above steps i.e; scan, plan, apply..  
+terraform RPC : Remote Procedure Calls : This performs the required communication across the terraform components i.e; plugins, terraform core.. 
+
+---
+
+Windows terraform installation:
+
+https://developer.hashicorp.com/terraform/install
+
+unzip and place all the files into a folder in c drive (c:\terraform) -->  copy terraform.exe file.
+
+Add c:\terraform --> Add it to the system PATH 
+system properties --> Environment varibale --> system varibales --> path --> edit --> c:\terraform
+
+open a new command prompt and enter "terraform version"
+
+--
+
+COmmand file formats we see in tf.
+
+.tf
+.tfvars
+.tfstate
+.tfplan
+
+=================
+
+Provider: Act as a plugin that helps tettaform to interact with the cloud environment. 
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+----
+
+Resources : Represents the real infra resources, you want to manage (delete/create/modify) ec2/s3/rds..
+
+resource "aws_s3_bucket" "my_example_bucket" {
+  bucket = "my-unique-bucket-name-12345" # Must be globally unique
+
+  tags = {
+    Name        = "My Practice Bucket"
+    Environment = "Dev"
+  }
+}
+
+------
+
+terraform init : Initializes your working direcvtory. Downloads the required provider plugin based on the configuration file we have. 
+--> One time for a project
+
+"terraform init"
+
+----
+
+terraform validate : Checks our .tf files for syntx errors.
+
+----
+
+terraform fmt : Automatically formats our code with proper indentation and spacing.
+
+---
+
+terraform plan : This is like a "dry run", shows what we are creating/change/delete. 
+
+terraform plan
+
+To write the plan into a file:
+
+terraform plan -out=ec2plan.tfplan
+terraform show ec2plan.tfplan
+terraform apply ec2plan.tfplan
+
+---
+
+terraform apply : This creates or updates the resources in AWS. terraform shows the plan again, and ask for confirmation.
+
+terraform apply
+
+skit the confirmation: 
+
+terraform apply -auto-approve
+
+---
+
+terraform destroy : Destroys all the resources managed by current configuration. 
+
+terraform destroy
+
+terraform destroy -auto-approve
+
+-----
+
+terraform statefile : (terraform.tfstate) : 
+--> stores the mappings between terraform configuration and aws infrastructure real resources.
+--> Act as "source of truth" for tracking the current state.
+
+-----
+
+terraform target option : 
+
+--> The target flag is used to apply or destroy specific resources of the configuration. 
+
+terraform destroy -target=aws_instance.mydbserver
+
+
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
