@@ -286,6 +286,69 @@ terraform {
 }
 
 
+===============
+
+TF file with output module
+
+---
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "web-server" {
+  ami                    = "ami-01b40e1bcccae197a"
+  instance_type          = "t3.micro"
+  vpc_security_group_ids = ["sg-0d129e20790cd92c0"]
+  key_name               = "awar08-kp"
+  tags = {
+    Name = "my-web-server"
+  }
+}
+
+resource "aws_s3_bucket" "mys3demo" {
+  bucket = "my-aviz-demo-bucket-13052026" 
+}
+
+output "instance_public_ip" {
+  value = aws_instance.web-server.public_ip
+}
+
+output "instance_private_ip" {
+  value = aws_instance.web-server.private_ip
+}
+
+output "mys3name" {
+  description = "THis is the bucket name"
+  value = aws_s3_bucket.mys3demo.id
+}
+
+output "mys3arn" {
+  description = "THis is the bucket name"
+  value = aws_s3_bucket.mys3demo.arn
+  sensitive = true
+}
+
+
+==================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

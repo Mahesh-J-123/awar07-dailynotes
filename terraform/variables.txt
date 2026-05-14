@@ -1,0 +1,152 @@
+String: 
+-------
+
+variable "instance_type" {
+  type = string
+  default = "t3.micro"
+}
+
+resource "aws_instance" "web-server" {
+  ami                    = "ami-01b40e1bcccae197a"
+  instance_type          = var.instance_type
+}
+
+============
+
+Number:
+------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "instance_type" {
+  type    = string
+  default = "t3.micro"
+}
+
+variable "instance_count" {
+  type    = number
+  default = 1
+}
+
+
+resource "aws_instance" "web-server" {
+  count         = var.instance_count
+  ami           = "ami-01b40e1bcccae197a"
+  instance_type = var.instance_type
+}
+
+=====
+bool / boolean : true / false
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "instance_type" {
+  type    = string
+  default = "t3.micro"
+}
+
+variable "instance_count" {
+  type    = number
+  default = 1
+}
+
+variable "api_termination" {
+  type    = bool
+  default = true
+}
+
+resource "aws_instance" "web-server" {
+  count         = var.instance_count
+  ami           = "ami-01b40e1bcccae197a"
+  instance_type = var.instance_type
+  disable_api_termination = var.api_termination
+}
+
+====
+
+List : An ordered collection of values of the same type. 
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "instance_type" {
+type = list(string)
+default = ["t3.micro", "t3.small", "t3.medium"]
+}
+
+variable "ami_id" {
+  type    = string
+  default = "ami-01b40e1bcccae197a"
+}
+
+variable "instance_count" {
+  type    = number
+  default = 1
+}
+
+variable "api_termination" {
+  type    = bool
+  default = true
+}
+
+resource "aws_instance" "web-server" {
+  count         = var.instance_count
+  ami           = var.ami_id
+  instance_type = var.instance_type[1]
+  disable_api_termination = var.api_termination
+}
+
+=========
+
+Map : A collection key-value pairs 
+
+variable "instance_type" {
+type = map(string)
+default = {
+	dev = "t3.micro" 
+	uat = "t3.small" 
+	prd = "t3.medium"
+}
+}
+
+resource "aws_instance" "web-server" {
+  count         = var.instance_count
+  ami           = var.ami_id
+  instance_type = var.instance_type["uat"]
+  disable_api_termination = var.api_termination
+}
+
+==========
+
+
+Tuple: multiple 
+
+variable "ec2_config" {
+  description = "Tuple for EC2: [instance_type, volume_size_gb]"
+  type        = tuple([string, number])
+  default     = ["t3.micro", 20] # 20GB root volume
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-0c55b159cbfafe1f0" # Example AMI
+  
+  # Accessing tuple elements by index
+  instance_type = var.ec2_config[0] 
+
+  root_block_device {
+    volume_size = var.ec2_config[1]
+  }
+
+  tags = {
+    Name = "TupleExampleInstance"
+  }
+}
+
+
+
+
+
