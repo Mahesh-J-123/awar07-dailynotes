@@ -345,6 +345,175 @@ Modules : if infra grows, we endup with copy and pasting the same resource block
 
 
 
+=========================
+
+terraform import : 
+
+We have 2 methods to import existing resources into terraform and we can track.
+
+
+CLI Import method 1:
+---
+
+Manually instance launched..  up and running
+
+--
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "existing_instance" {
+  ami = "ami-09ed39e30153c3bf9"
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "manual-instance"
+  }
+}
+
+----
+
+terraform import aws_instance.existing_instance i-06d76a954d74caebd
+
+-----
+This is a new approach, to import exiosting resources using a block (not cli)
+-----
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+import {
+  to = aws_instance.existing_instance
+  id = "i-06d76a954d74caebd"
+}
+
+resource "aws_instance" "existing_instance" {
+  ami = "ami-09ed39e30153c3bf9"
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "manual-instance"
+  }
+}
+
+=================
+1. String fucntions
+=================
+
+upper()
+lower()
+---
+
+locals {
+	env = "DEV"
+}
+
+resource "aws_s3_bucket" "existing_bucket" {
+  bucket = "avinash-s3-demo-${lower(local.env)}"
+}
+
+
+---
+
+format()
+
+locals {
+	bucket_name = format("myapp-%s-bucket-%s", "dev", "2026")
+	# --> myapp-dev-bucket-2026
+}
+
+---
+
+replace()
+
+replace("hello_world", "_", "-") 	#--> "hello-world"
+
+---
+
+split() and join()
+
+split ("," "dev,uat,prd") 			#--> ["dev","uat","prd"]
+
+join("-" "web,app,svr")				#--> "web-app-svr" 
+
+---
+
+trimspace()
+
+trimspace("  dev  " )				#--> "dev"
+
+======
+2. File functions:
+======
+
+file("/Users/avizway/Desktop/keypairs/awar08-kp.pem")
+
+Number functions:
+
+max(5, 12, 9)					#--> 12
+min(5, 12, 9)					#--> 5
+
+======
+3. Encoded functions
+======
+
+
+resource "aws_s3_bucket" "mybucket" {
+  bucket = "avinash-s3-demo"
+}
+
+resource "aws_s3_bucket_policy" "Public_read" {
+	bucket = aws_s3_bucket.mybucket.id
+	policy = jsonencode(
+	{
+	  "Version": "2012-10-17",
+	  "Statement": [
+	    {
+	      "Sid": "Statement1",
+	      "Effect": "Allow",
+	      "Principal": "*",
+	      "Action": [
+	        "s3:GetObject"
+	      ],
+	      "Resource": "${aws_s3_bucket.mybucket.arn}"
+	    }
+	  ]
+	}
+	)
+}
+
+=========
+4. Collection Functions
+=========
+
+toset(): Converts a list to a set (Removes the duplicates used with for_each)
+
+resource "aws_instance" "mywebserver" {
+  for_each = toset(["dev-server", "uat-server", "prd-server"])
+  ami           = "ami-01b40e1bcccae197a"
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = each.key
+  }
+}
+
+---
+
+tolist()
+
+tolist(toset(["b","a", "c"]))	--> ["a", "b", "c"]
+tomap ({ name = "dev", env = "developement"})
+
+---
+
+concat()
+
+["dev", "uat"], ["prd", "dr"]
+
+concat(["dev", "uat"], ["prd", "dr"])			#--> ["dev", "uat", "prd", "dr"
 
 
 
